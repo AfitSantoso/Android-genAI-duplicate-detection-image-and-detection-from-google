@@ -19,7 +19,7 @@ fun DashboardScreen(
     Scaffold(
         topBar = {
             TopAppBar(
-                title = { Text("Dashboard ${user.role}") },
+                title = { Text("Dashboard ${user.role ?: ""}") },
                 actions = {
                     TextButton(onClick = onLogout) {
                         Text("Logout", color = MaterialTheme.colorScheme.error)
@@ -41,14 +41,14 @@ fun DashboardScreen(
                 fontSize = 18.sp
             )
             Text(
-                text = user.name,
+                text = user.name ?: "",
                 fontSize = 24.sp,
                 fontWeight = FontWeight.Bold,
                 color = MaterialTheme.colorScheme.primary
             )
             Spacer(modifier = Modifier.height(8.dp))
             Text(
-                text = "NIP: ${user.nip}",
+                text = "NIP: ${user.nip ?: ""}",
                 fontSize = 16.sp,
                 color = MaterialTheme.colorScheme.secondary
             )
@@ -63,12 +63,12 @@ fun DashboardScreen(
                     modifier = Modifier.padding(16.dp)
                 ) {
                     Text(
-                        text = "Status Anda saat ini adalah ${user.role}",
+                        text = "Status Anda saat ini adalah ${user.role ?: ""}",
                         fontWeight = FontWeight.Medium
                     )
                     Spacer(modifier = Modifier.height(8.dp))
                     Text(
-                        text = user.instructions,
+                        text = user.instructions ?: "",
                         fontSize = 14.sp,
                         color = MaterialTheme.colorScheme.outline
                     )

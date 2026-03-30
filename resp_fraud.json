@@ -1,0 +1,14 @@
+{
+  "success": true,
+  "message": "Belum ada hasil FRIDAYS Score untuk customer CNT-000115",
+  "data": {
+    "customer": {
+      "id": 1016,
+      "no_contract": "CNT-000115",
+      "name": "Afit Santoso",
+      "fraud_status": "FLAGGED"
+    },
+    "fridays_result": null,
+    "message": "CMO belum mengupload dokumen untuk customer ini"
+  }
+}

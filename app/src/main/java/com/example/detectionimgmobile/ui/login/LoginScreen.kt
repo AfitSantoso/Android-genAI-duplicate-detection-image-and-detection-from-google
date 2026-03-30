@@ -27,7 +27,7 @@ fun LoginScreen(
     var nip by remember { mutableStateOf("") }
     var password by remember { mutableStateOf("") }
     var passwordVisible by remember { mutableStateOf(false) }
-    var selectedRole by remember { mutableStateOf("CMO") }
+    var selectedRole by remember { mutableStateOf("BM") }
     
     val uiState by viewModel.uiState.collectAsState()
 
@@ -92,16 +92,16 @@ fun LoginScreen(
             verticalAlignment = Alignment.CenterVertically
         ) {
             RadioButton(
-                selected = selectedRole == "CMO",
-                onClick = { selectedRole = "CMO" }
-            )
-            Text("CMO", modifier = Modifier.padding(end = 16.dp))
-            
-            RadioButton(
                 selected = selectedRole == "BM",
                 onClick = { selectedRole = "BM" }
             )
-            Text("BM")
+            Text("BM", modifier = Modifier.padding(end = 16.dp))
+            
+            RadioButton(
+                selected = selectedRole == "AUDIT",
+                onClick = { selectedRole = "AUDIT" }
+            )
+            Text("AUDIT")
         }
 
         Spacer(modifier = Modifier.height(24.dp))
