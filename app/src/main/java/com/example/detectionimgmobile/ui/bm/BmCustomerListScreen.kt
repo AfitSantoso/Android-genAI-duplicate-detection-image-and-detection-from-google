@@ -97,7 +97,11 @@ fun BmCustomerListScreen(
                     verticalArrangement = Arrangement.spacedBy(8.dp)
                 ) {
                     items(customerList) { customer ->
-                        CustomerCard(customer = customer, onClick = { onCustomerClick(customer.customer_id) })
+                        CustomerCard(
+                            customer = customer,
+                            user = user,
+                            onClick = { onCustomerClick(customer.customer_id) }
+                        )
                     }
                 }
             }
@@ -106,7 +110,34 @@ fun BmCustomerListScreen(
 }
 
 @Composable
-fun CustomerCard(customer: CustomerFraudSummary, onClick: () -> Unit) {
+fun CustomerCard(customer: CustomerFraudSummary, user: LoginData, onClick: () -> Unit) {
+    var invalidDocs by remember { mutableStateOf(customer.total_flagged ?: 0) }
+    var scoreFetched by remember { mutableStateOf(false) }
+
+    LaunchedEffect(customer.customer_id) {
+        if (!scoreFetched && (customer.fraud_status == "FLAGGED" || customer.fraud_status == "CONFIRMED_FRAUD")) {
+            try {
+                val api = RetrofitClient.getAuthService(user.user_id.toString(), user.role)
+                val response = kotlinx.coroutines.withContext(kotlinx.coroutines.Dispatchers.IO) {
+                    api.getBmCustomerFraudResult(customer.customer_id)
+                }
+                if (response.isSuccessful) {
+                    val breakdown = response.body()?.data?.breakdown
+                    if (breakdown != null) {
+                        invalidDocs = breakdown.count { item ->
+                            val sim = item.similarity_percentage ?: 0.0
+                            sim > 65.0 || item.detection_status == "FRAUD" || item.detection_status == "INSTANT_DUPLICATE"
+                        }
+                    }
+                }
+            } catch (e: Exception) {
+                // Ignore, fallback to default value
+            } finally {
+                scoreFetched = true
+            }
+        }
+    }
+
     Card(
         modifier = Modifier
             .fillMaxWidth()
@@ -138,7 +169,6 @@ fun CustomerCard(customer: CustomerFraudSummary, onClick: () -> Unit) {
             }
 
             // Right side showing total flagged documents
-            val invalidDocs = customer.total_flagged ?: 0
             Column(horizontalAlignment = Alignment.End) {
                 if (invalidDocs > 0) {
                     Row(verticalAlignment = Alignment.CenterVertically) {
