@@ -88,7 +88,7 @@ fun BmFraudScoreScreen(
             } else if (fraudResult != null) {
                 val data = fraudResult!!
                 val score = data.fridays_score
-                val breakdownList = data.breakdown ?: emptyList()
+                val breakdownList = score?.breakdown ?: data.breakdown ?: emptyList()
                 
                 if (score == null) {
                     Column(
@@ -141,8 +141,15 @@ fun BmFraudScoreScreen(
                                         fontSize = 48.sp,
                                         color = if (score.any_fraud_detected) Color.Red else Color(0xFF4CAF50)
                                     )
+                                    val riskLevelText = if (score.risk_level == null || score.risk_level.isJsonNull) {
+                                        "Unknown"
+                                    } else if (score.risk_level.isJsonObject) {
+                                        score.risk_level.asJsonObject.get("label")?.asString ?: "Unknown"
+                                    } else {
+                                        score.risk_level.asString.replace("_", " ")
+                                    }
                                     Text(
-                                        text = "Risk Level: ${(score.risk_level ?: "UNKNOWN").replace("_", " ")}",
+                                        text = "Risk Level: $riskLevelText",
                                         fontSize = 16.sp,
                                         fontWeight = FontWeight.Medium
                                     )
@@ -252,9 +259,17 @@ fun DocumentBreakdownCard(item: BreakdownItem) {
                         color = textColor,
                         fontSize = 12.sp
                     )
-                    item.fraud_patterns.forEach { pattern ->
+                    item.fraud_patterns.forEach { patternElement ->
+                        val textStr = if (patternElement.isJsonObject) {
+                            val obj = patternElement.asJsonObject
+                            val desc = obj.get("description")?.asString
+                            val pat = obj.get("pattern")?.asString
+                            desc ?: pat ?: ""
+                        } else {
+                            patternElement.asString
+                        }
                         Text(
-                            text = "• ${pattern ?: ""}",
+                            text = "• $textStr",
                             color = textColor,
                             fontSize = 12.sp
                         )

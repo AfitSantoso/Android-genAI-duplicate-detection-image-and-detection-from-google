@@ -1,6 +1,7 @@
 package com.example.detectionimgmobile.data.model
 
 import com.google.gson.annotations.SerializedName
+import com.google.gson.JsonElement
 
 data class BmCmoListResponse(
     val total: Int?,
@@ -61,26 +62,55 @@ data class CustomerFraudDetail(
 )
 
 data class FridaysScoreDetail(
-    val score: Double,
-    val score_percentage: Double,
-    val decision: String,
-    val risk_level: String,
-    val total_flagged: Int,
-    val any_fraud_detected: Boolean,
+    val score: Double?,
+    val score_percentage: Double?,
+    val decision: String?,
+    val risk_level: JsonElement?,
+    val summary: ResultSummary?,
+    val breakdown: List<BreakdownItem>?
+) {
+    val total_flagged: Int
+        get() = (summary?.flagged_documents?.size ?: 0) + (summary?.google_flagged_proofs?.size ?: 0)
+
+    val any_fraud_detected: Boolean
+        get() = total_flagged > 0
+}
+
+data class RiskLevel(
+    val level: String?,
+    val color: String?,
+    val label: String?,
+    val description: String?,
+    val action_required: String?
+)
+
+data class ResultSummary(
+    val total_components: Int?,
+    val uploaded_components: Int?,
+    val skipped_components: Int?,
+    val flagged_documents: List<String>?,
+    val google_flagged_proofs: List<String>?,
     val calculated_at: String?
 )
 
 data class BreakdownItem(
-    val component: String,
-    val category: String,
-    val similarity_percentage: Double,
+    val component: String?,
+    val category: String?,
+    val similarity_percentage: Double?,
     val matched_fields: List<MatchedField>?,
     val comparison_summary: String?,
-    val fraud_patterns: List<String>?,
+    val fraud_patterns: List<JsonElement>?,
     val top_similar_matches: List<SimilarMatch>?,
     val visual_analysis: String?,
     val detection_status: String?,
     val note: String?
+)
+
+data class FraudPattern(
+    val pattern: String?,
+    val severity: String?,
+    val description: String?,
+    val detail: String?
 )
 
 data class MatchedField(
