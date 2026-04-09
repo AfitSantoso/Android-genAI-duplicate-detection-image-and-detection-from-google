@@ -7,8 +7,10 @@ import retrofit2.converter.gson.GsonConverterFactory
 import java.util.concurrent.TimeUnit
 
 object RetrofitClient {
-    // Current Ngrok URL from your logs
-    private const val BASE_URL = "https://irremeably-swathable-laree.ngrok-free.dev/" 
+    // Local network access — Ngrok REMOVED for security
+    // Use your PC's IP address (10.190.129.197) so physical Android devices can connect
+    // Note: Jika menggunakan Android Emulator, gunakan "http://10.0.2.2:8000/"
+    private const val BASE_URL = "http://10.190.129.197:8000/"
 
     private val logging = HttpLoggingInterceptor().apply {
         level = HttpLoggingInterceptor.Level.BODY
@@ -16,9 +18,9 @@ object RetrofitClient {
 
     private val client = OkHttpClient.Builder()
         .addInterceptor(logging)
-        .connectTimeout(30, TimeUnit.SECONDS) // Increased timeout for Ngrok
-        .readTimeout(30, TimeUnit.SECONDS)
-        .writeTimeout(30, TimeUnit.SECONDS)
+        .connectTimeout(60, TimeUnit.SECONDS)
+        .readTimeout(60, TimeUnit.SECONDS)
+        .writeTimeout(60, TimeUnit.SECONDS)
         .build()
 
     val instance: ApiService by lazy {
@@ -35,16 +37,17 @@ object RetrofitClient {
         val authClient = OkHttpClient.Builder()
             .addInterceptor(logging)
             .addInterceptor(AuthInterceptor(userId, role))
-            .connectTimeout(30, TimeUnit.SECONDS)
-            .readTimeout(30, TimeUnit.SECONDS)
+            .connectTimeout(60, TimeUnit.SECONDS)
+            .readTimeout(60, TimeUnit.SECONDS)
+            .writeTimeout(60, TimeUnit.SECONDS)
             .build()
-            
+
         val retrofit = Retrofit.Builder()
             .baseUrl(BASE_URL)
             .addConverterFactory(GsonConverterFactory.create())
             .client(authClient)
             .build()
-            
+
         return retrofit.create(ApiService::class.java)
     }
 }
